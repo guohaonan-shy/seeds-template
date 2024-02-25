@@ -5,7 +5,36 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 
-class LakesideSearch:
+def search_handle(driver: WebDriver):
+    print("Search result Handle")
+    # 前端输出是分页后的结果，需要判断是否要到下一页
+    # 对于搜索行为，到这里我觉得就可以
+    # 这个函数可以抽象成获取目标值，那么就需要考虑分页的
+    table = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located(
+            # (By.CSS_SELECTOR, 'table[class="ui celled table"]')
+            (By.XPATH, "//table[@class='ui celled table']//tbody//tr")
+        )
+    )
+
+    rows = table.find_elements(By.XPATH, "//td[1]")
+    num = len(rows)
+    print(num)
+
+    for row in rows:
+        print("Name:", row.text)
+
+    try:
+        if num > 0:
+            return True
+        else:
+            return False
+    except:
+        print("exception\n")
+        return False
+
+
+class LakesideSearchSeeds:
 
     def __init__(self) -> None:
         pass
@@ -14,7 +43,7 @@ class LakesideSearch:
         # 这块也是个拓展点，构建符合条件的搜索条件
         target = "y"
         self.search(driver, target)
-        res = self.search_handle(driver)
+        res = search_handle(driver)
         print(res)
 
     def search(self, driver: WebDriver, target: str):
@@ -30,34 +59,6 @@ class LakesideSearch:
 
         return
 
-    def search_handle(self, driver: WebDriver):
-        print("Search result Handle")
-        # 前端输出是分页后的结果，需要判断是否要到下一页
-        # 对于搜索行为，到这里我觉得就可以
-        # 这个函数可以抽象成获取目标值，那么就需要考虑分页的
-        table = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located(
-                # (By.CSS_SELECTOR, 'table[class="ui celled table"]')
-                (By.XPATH, "//table[@class='ui celled table']//tbody//tr")
-            )
-        )
-
-        rows = table.find_elements(By.XPATH, "//td[1]")
-        num = len(rows)
-        print(num)
-
-        for row in rows:
-            print("Name:", row.text)
-
-        try:
-            if num > 0:
-                return True
-            else:
-                return False
-        except:
-            print("exception\n")
-            return False
-
 
 if __name__ == "__main__":
     options = webdriver.ChromeOptions()
@@ -71,7 +72,7 @@ if __name__ == "__main__":
 
     driver.get("http://localhost:3020")
 
-    seed = LakesideSearch()
+    seed = LakesideSearchSeeds()
     seed.execute_seeds(driver=driver)
 
     driver.quit()

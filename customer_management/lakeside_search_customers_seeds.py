@@ -5,74 +5,72 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 
-def search_handle(driver: WebDriver):
-    print("Search result Handle")
-    # 前端输出是分页后的结果，需要判断是否要到下一页
-    # 对于搜索行为，到这里我觉得就可以
-    # 这个函数可以抽象成获取目标值，那么就需要考虑分页的
-    table = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located(
-            # (By.CSS_SELECTOR, 'table[class="ui celled table"]')
-            (By.XPATH, "//table[@class='ui celled table']//tbody//tr")
-        )
-    )
-
-    rows = table.find_elements(By.XPATH, "//td[1]")
-    num = len(rows)
-    print(num)
-
-    for row in rows:
-        print("Name:", row.text)
-
-    try:
-        if num > 0:
-            return True
-        else:
-            return False
-    except:
-        print("exception\n")
-        return False
-
-
 class LakesideSearchSeeds:
 
-    def __init__(self) -> None:
+    def __init__(self, driver: WebDriver) -> None:
+        self.driver = driver
         pass
 
-    def execute_seeds(self, driver: WebDriver):
+    def execute_seeds(self, condition: str, target: str):
         # 这块也是个拓展点，构建符合条件的搜索条件
-        target = "y"
-        self.search(driver, target)
-        res = search_handle(driver)
-        print(res)
+        self.search(condition, target)
+        return self.search_handle(target)
 
-    def search(self, driver: WebDriver, target: str):
+    def search(self, condition: str, target: str):
+        driverIns = self.driver
 
         # starting
+        # input search key
         print("Input customer name that we want to find......")
-        search_input = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Search..."]')
-        search_input.send_keys(target)
+        search_input = driverIns.find_element(By.CSS_SELECTOR, 'input[placeholder="Search..."]')
+        search_input.send_keys(condition)
 
         print("Click on 'Search' button")
-        submit_button = driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
+        submit_button = driverIns.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
         submit_button.click()
 
         return
 
+    def search_handle(self, target):
+        print("Search result Handle")
+        # search result is more than 10?
 
-if __name__ == "__main__":
-    options = webdriver.ChromeOptions()
-    options.add_argument('__no-sandbox')
-    options.add_argument('--headless')
-    options.add_argument('--hide-scrollbars')
+        table = self.driver.find_element(By.XPATH, "//table[@class='ui celled table']")
+        foot = table.find_element(By.XPATH, ".//tfoot//tr")
+        tags = foot.find_elements(By.TAG_NAME, "th")
 
-    driver = webdriver.Chrome(options=options)
+        cntBlock = tags[0]
+        listBlock = tags[1]
 
-    driver.set_window_size(1920, 967)
+        total = int(cntBlock.text.split(sep=" of ")[1])
+        print(total)
 
-    driver.get("http://localhost:3020")
+        iterCnt = total // 10 if total % 10 == 0 else total // 10 + 1
 
-    seed = LakesideSearchSeeds()
-    seed.execute_seeds(driver=driver)
+        res = False
 
-    driver.quit()
+        for i in range(iterCnt):
+
+            itable = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, "//table[@class='ui celled table']//tbody//tr")
+                )
+            )
+
+            rows = itable.find_elements(By.XPATH, "//td[1]")
+
+            for row in rows:
+                if row.text == target:
+                    res = True
+                    break
+
+            if res:
+                print("Find Target !!!!")
+                break
+
+            next = listBlock.find_element(By.XPATH, ".//div[@class='ui pagination right floated menu']/a[2]")
+            print(next.get_attribute("class"))
+            if next.get_attribute("class") == "icon item":
+                next.click()
+
+        return res

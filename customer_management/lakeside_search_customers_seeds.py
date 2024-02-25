@@ -23,6 +23,7 @@ class LakesideSearchSeeds:
         # input search key
         print("Input customer name that we want to find......")
         search_input = driverIns.find_element(By.CSS_SELECTOR, 'input[placeholder="Search..."]')
+        search_input.clear()
         search_input.send_keys(condition)
 
         print("Click on 'Search' button")

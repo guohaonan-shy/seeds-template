@@ -227,6 +227,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(new_profile["Email Address"], oldDto.email_address)
         self.assertEqual(new_profile["Phone Number"], oldDto.phone_number)
         print("recover success......")
+        driver.quit()
 
     def test_converDay(self):
         utils.convertDay("1st")

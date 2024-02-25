@@ -1,38 +1,24 @@
-import time
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 class LakesideSearch:
 
     def __init__(self) -> None:
-        options = webdriver.ChromeOptions()
-        options.add_argument('__no-sandbox')
-        options.add_argument('--headless')
-        options.add_argument('--hide-scrollbars')
+        pass
 
-        driver = webdriver.Chrome(options=options)
-
-        driver.set_window_size(1920, 967)
-
-        driver.get("http://localhost:3020")
-        self.driver = driver
-
-    def quit(self):
-        self.driver.quit()
-
-    def execute_seeds(self):
+    def execute_seeds(self, driver: WebDriver):
         # 这块也是个拓展点，构建符合条件的搜索条件
         target = "y"
-        res = self.search(target)
+        self.search(driver, target)
+        res = self.search_handle(driver)
         print(res)
 
-    def search(self, target: str):
-        driver = self.driver
+    def search(self, driver: WebDriver, target: str):
+
         # starting
         print("Input customer name that we want to find......")
         search_input = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Search..."]')
@@ -42,6 +28,9 @@ class LakesideSearch:
         submit_button = driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
         submit_button.click()
 
+        return
+
+    def search_handle(self, driver: WebDriver):
         print("Search result Handle")
         # 前端输出是分页后的结果，需要判断是否要到下一页
         # 对于搜索行为，到这里我觉得就可以
@@ -53,7 +42,7 @@ class LakesideSearch:
             )
         )
 
-        rows = driver.find_elements(By.XPATH, "//td[1]")
+        rows = table.find_elements(By.XPATH, "//td[1]")
         num = len(rows)
         print(num)
 
@@ -71,6 +60,18 @@ class LakesideSearch:
 
 
 if __name__ == "__main__":
+    options = webdriver.ChromeOptions()
+    options.add_argument('__no-sandbox')
+    options.add_argument('--headless')
+    options.add_argument('--hide-scrollbars')
+
+    driver = webdriver.Chrome(options=options)
+
+    driver.set_window_size(1920, 967)
+
+    driver.get("http://localhost:3020")
+
     seed = LakesideSearch()
-    seed.execute_seeds()
-    seed.quit()
+    seed.execute_seeds(driver=driver)
+
+    driver.quit()

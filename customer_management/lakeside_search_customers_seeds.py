@@ -1,3 +1,5 @@
+import time
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
@@ -13,6 +15,7 @@ class LakesideSearchSeeds:
     def execute_seeds(self, condition: str, target: str):
         # 这块也是个拓展点，构建符合条件的搜索条件
         self.search(condition, target)
+        time.sleep(1)
         return self.search_handle(target)
 
     def search(self, condition: str, target: str):

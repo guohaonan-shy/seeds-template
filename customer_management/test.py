@@ -13,6 +13,20 @@ from customer_management.lakeside_handle_message_seeds import LakesideRespondNot
 from customer_management.lakeside_search_customers_seeds import LakesideSearchSeeds
 
 
+def init_customer_management_service_driver() -> webdriver:
+    options = webdriver.ChromeOptions()
+    options.add_argument('__no-sandbox')
+    options.add_argument('--headless')
+    options.add_argument('--hide-scrollbars')
+
+    driver = webdriver.Chrome(options=options)
+
+    driver.set_window_size(1920, 967)
+
+    driver.get("http://localhost:3020")
+    return driver
+
+
 class UpdateDto:
     def __init__(self, first_name: str, last_name: str, date_of_birth: str, street_address: str, postal_code: str,
                  city: str, email_address: str, phone_number: str):
@@ -26,9 +40,10 @@ class UpdateDto:
         self.phone_number = phone_number
         return
 
+
 class AddCustomerDto:
     def __init__(self, email, password, first_name, last_name, birth, street_address, postal_code, city,
-                      phone):
+                 phone):
         self.email = email
         self.password = password
         self.first_name = first_name
@@ -39,18 +54,11 @@ class AddCustomerDto:
         self.city = city
         self.phone = phone
 
+
 class MyTestCase(unittest.TestCase):
     def test_search_true(self):
-        options = webdriver.ChromeOptions()
-        options.add_argument('__no-sandbox')
-        options.add_argument('--headless')
-        options.add_argument('--hide-scrollbars')
 
-        driver = webdriver.Chrome(options=options)
-
-        driver.set_window_size(1920, 967)
-
-        driver.get("http://localhost:3020")
+        driver = init_customer_management_service_driver()
 
         seed = LakesideSearchSeeds(driver)
         findRes = seed.execute_seeds("a", "Fernande Levicount")
@@ -59,16 +67,7 @@ class MyTestCase(unittest.TestCase):
         driver.quit()
 
     def test_search_false(self):
-        options = webdriver.ChromeOptions()
-        options.add_argument('__no-sandbox')
-        options.add_argument('--headless')
-        options.add_argument('--hide-scrollbars')
-
-        driver = webdriver.Chrome(options=options)
-
-        driver.set_window_size(1920, 967)
-
-        driver.get("http://localhost:3020")
+        driver = init_customer_management_service_driver()
 
         seed = LakesideSearchSeeds(driver)
         findRes = seed.execute_seeds("a", "ghn")
@@ -77,16 +76,7 @@ class MyTestCase(unittest.TestCase):
         driver.quit()
 
     def test_fetch_profile(self):
-        options = webdriver.ChromeOptions()
-        options.add_argument('__no-sandbox')
-        options.add_argument('--headless')
-        options.add_argument('--hide-scrollbars')
-
-        driver = webdriver.Chrome(options=options)
-
-        driver.set_window_size(1920, 967)
-
-        driver.get("http://localhost:3020")
+        driver = init_customer_management_service_driver()
 
         seed = LakesideSearchSeeds(driver)
         target = "Fernande Levicount"
@@ -110,16 +100,7 @@ class MyTestCase(unittest.TestCase):
                 self.assertEqual(value, "055 222 4111")
 
     def test_edit_profile(self):
-        options = webdriver.ChromeOptions()
-        options.add_argument('__no-sandbox')
-        options.add_argument('--headless')
-        options.add_argument('--hide-scrollbars')
-
-        driver = webdriver.Chrome(options=options)
-
-        driver.set_window_size(1920, 967)
-
-        driver.get("http://localhost:3020")
+        driver = init_customer_management_service_driver()
 
         seed = LakesideSearchSeeds(driver)
         target = "Max Mustermann"
@@ -149,12 +130,14 @@ class MyTestCase(unittest.TestCase):
                            postal_code=postal, city=city, phone_number=profile["Phone Number"],
                            email_address=profile["Email Address"])
 
-        newDto = UpdateDto(first_name="Maxx", last_name="Mastermann", date_of_birth="1998-04-21", street_address="Redhill 100",
+        newDto = UpdateDto(first_name="Maxx", last_name="Mastermann", date_of_birth="1998-04-21",
+                           street_address="Redhill 100",
                            postal_code="123456", city="Singapore", email_address="xxxxxx@example.com",
                            phone_number="+864444 8783")
 
         s = LakesideEditCustomerProfileSeeds(driver)
-        s.execute_seeds(newDto.first_name, newDto.last_name, newDto.birthday, newDto.address, newDto.postal_code, newDto.city, newDto.email_address, newDto.phone_number)
+        s.execute_seeds(newDto.first_name, newDto.last_name, newDto.birthday, newDto.address, newDto.postal_code,
+                        newDto.city, newDto.email_address, newDto.phone_number)
 
         # fetch again
         print("start access profile page")
@@ -199,8 +182,10 @@ class MyTestCase(unittest.TestCase):
 
         # recover
         print("start recover......")
-        s.execute_seeds(first_name=oldDto.first_name, last_name=oldDto.last_name, date_of_birth=oldDto.birthday, street_address=oldDto.address,
-                        postal_code=oldDto.postal_code, city=oldDto.city, email_address=oldDto.email_address, phone_number=oldDto.phone_number)
+        s.execute_seeds(first_name=oldDto.first_name, last_name=oldDto.last_name, date_of_birth=oldDto.birthday,
+                        street_address=oldDto.address,
+                        postal_code=oldDto.postal_code, city=oldDto.city, email_address=oldDto.email_address,
+                        phone_number=oldDto.phone_number)
         # fetch again
         print("start access profile page")
         block = driver.find_element(By.XPATH, "//div[@class='row']")
@@ -249,27 +234,24 @@ class MyTestCase(unittest.TestCase):
 
     def test_add_customer(self):
         # 1. add a new customer
-        options = webdriver.ChromeOptions()
-        options.add_argument('__no-sandbox')
-        options.add_argument('--headless')
-        options.add_argument('--hide-scrollbars')
-
-        driver = webdriver.Chrome(options=options)
-
-        driver.set_window_size(1920, 967)
-
-        driver.get("http://localhost:3020")
+        driver = init_customer_management_service_driver()
 
         add_customer_seed = LakesideAddCustomerSeeds(driver)
 
         # keep a struct to store info which is used to compare with db
-        case_random_number = random.randint(a= 1000000, b=9999999)
+        case_random_number = random.randint(a=1000000, b=9999999)
 
-        testDto = AddCustomerDto(email="guohaonan{}@example.com".format(case_random_number), password=case_random_number, first_name="Haonan{}".format(case_random_number), last_name="Guo", birth="1998-04-21",
-                                 street_address="redhill {}".format(case_random_number), postal_code=random.randint(1000, 9999), city="Singapore", phone="+86 {} {}".format(random.randint(0000,9999), random.randint(0000,9999)))
+        testDto = AddCustomerDto(email="guohaonan{}@example.com".format(case_random_number),
+                                 password=case_random_number, first_name="Haonan{}".format(case_random_number),
+                                 last_name="Guo", birth="1998-04-21",
+                                 street_address="redhill {}".format(case_random_number),
+                                 postal_code=random.randint(1000, 9999), city="Singapore",
+                                 phone="+86 {} {}".format(random.randint(0000, 9999), random.randint(0000, 9999)))
 
-        add_customer_seed.execute_seeds(email= testDto.email, password=testDto.password, first_name=testDto.first_name, last_name=testDto.last_name, birth=testDto.birth,
-                                        street_address=testDto.street_address, postal_code=testDto.postal_code, city=testDto.city, phone=testDto.phone)
+        add_customer_seed.execute_seeds(email=testDto.email, password=testDto.password, first_name=testDto.first_name,
+                                        last_name=testDto.last_name, birth=testDto.birth,
+                                        street_address=testDto.street_address, postal_code=testDto.postal_code,
+                                        city=testDto.city, phone=testDto.phone)
 
         # compare and assert that the customer info is the same with expectation
         search_seeds = LakesideSearchSeeds(driver)
@@ -295,16 +277,7 @@ class MyTestCase(unittest.TestCase):
         driver.quit()
 
     def test_response(self):
-        options = webdriver.ChromeOptions()
-        options.add_argument('__no-sandbox')
-        options.add_argument('--headless')
-        options.add_argument('--hide-scrollbars')
-
-        driver = webdriver.Chrome(options=options)
-
-        driver.set_window_size(1920, 967)
-
-        driver.get("http://localhost:3020")
+        driver = init_customer_management_service_driver()
 
         # todo: 先这样，后续完成注册seeds，可以构建自动化case
         # 这里先手动用test账号构建一些消息
@@ -312,6 +285,7 @@ class MyTestCase(unittest.TestCase):
         response_seeds.execute_seeds()
 
         driver.quit()
+
 
 if __name__ == '__main__':
     unittest.main()

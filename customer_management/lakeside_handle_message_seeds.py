@@ -37,8 +37,6 @@ class LakesideRespondNotification:
             # back to customer homepage
             self.driver.find_element(By.CSS_SELECTOR, 'a[href="/"]').click()
 
-
-
     def response(self, is_response: bool, response: str):
         # here, users stay in the profile page
         driverIns = self.driver

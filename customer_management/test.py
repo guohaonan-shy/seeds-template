@@ -9,6 +9,7 @@ import utils
 from customer_management.lakeside_customer_add_customer_seeds import LakesideAddCustomerSeeds
 from customer_management.lakeside_edit_customer_profile_seeds import LakesideEditCustomerProfileSeeds
 from customer_management.lakeside_fetch_customer_seeds import LakeSideFetchProfileSeeds
+from customer_management.lakeside_handle_message_seeds import LakesideRespondNotification
 from customer_management.lakeside_search_customers_seeds import LakesideSearchSeeds
 
 
@@ -291,6 +292,26 @@ class MyTestCase(unittest.TestCase):
             elif key == "Phone Number":
                 self.assertEqual("+86 {}".format(value), testDto.phone)
 
+        driver.quit()
+
+    def test_response(self):
+        options = webdriver.ChromeOptions()
+        options.add_argument('__no-sandbox')
+        options.add_argument('--headless')
+        options.add_argument('--hide-scrollbars')
+
+        driver = webdriver.Chrome(options=options)
+
+        driver.set_window_size(1920, 967)
+
+        driver.get("http://localhost:3020")
+
+        # todo: 先这样，后续完成注册seeds，可以构建自动化case
+        # 这里先手动用test账号构建一些消息
+        response_seeds = LakesideRespondNotification(driver)
+        response_seeds.execute_seeds()
+
+        driver.quit()
 
 if __name__ == '__main__':
     unittest.main()

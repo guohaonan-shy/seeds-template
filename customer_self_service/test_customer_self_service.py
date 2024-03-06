@@ -12,6 +12,7 @@ from customer_management.lakeside_search_customers_seeds import LakesideSearchSe
 from customer_management.test import init_customer_management_service_driver
 from customer_self_service.lakeside_change_address_seeds import LakesideChangeAddressSeeds
 from customer_self_service.lakeside_complete_user_profile_seeds import LakesideCompleteProfileSeeds
+from customer_self_service.lakeside_customer_respond_seeds import LakesideCustomerRespondSeeds
 from customer_self_service.lakeside_customer_send_message_seeds import LakesideCustomerSendMessageSeeds
 from customer_self_service.lakeside_insurance_request_seeds import LakesideRequestInsuranceSeeds
 from customer_self_service.lakeside_login_seeds import LakesideLoginSeeds
@@ -166,12 +167,23 @@ class MyTestCase(unittest.TestCase):
         test_response = "Test Response!!!"
         manager_seed.response(is_response=True, response=test_response)
 
-
-
         driver.quit()
         management_driver.quit()
 
+    def test_respond(self):
+        driver = init_customer_self_service_driver()
+        # login
+        login_seed = LakesideLoginSeeds(driver)
+        login_seed.execute_seeds(from_signup=False, email="testUser10001@example", password="123456")
 
+        # respond
+        respond_seed = LakesideCustomerRespondSeeds(driver)
+        pid = respond_seed.execute_seeds()
+
+        print("pid:{},assert......".format(pid))
+        status = driver.find_element(By.CSS_SELECTOR, 'span[style="color: green;"]')
+        self.assertEqual(status, "accepted")
+        driver.quit()
 
 
 if __name__ == '__main__':

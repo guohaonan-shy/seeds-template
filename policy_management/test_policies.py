@@ -79,6 +79,7 @@ class MyTestCase(unittest.TestCase):
             detail_button = columns[4].find_element(By.CSS_SELECTOR, 'a[class="ui compact small button"]')
             policy_id = detail_button.get_attribute("href").split('/')[-1]
             if policy_id == target_policy_id:
+                print("policy_id:{},assert".format(policy_id))
                 status = columns[3].find_element(By.CSS_SELECTOR, 'i').text
                 self.assertEqual(status, "Waiting for Customer response")
                 return

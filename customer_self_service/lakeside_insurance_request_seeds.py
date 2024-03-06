@@ -61,3 +61,15 @@ class LakesideRequestInsuranceSeeds:
         self.driver.find_element(By.CSS_SELECTOR,
                                  'button[class="ui primary right floated button"]').click()
         time.sleep(1)
+
+    def jump_to_policies(self):
+        if self.driver.current_url == "http://localhost:3000/policies":
+            return
+
+        if self.driver.current_url == "http://localhost:3000/profile" or "http://localhost:3000/contact":
+            policies_tab = self.driver.find_element(By.CSS_SELECTOR, 'a[href="/policies"]')
+            policies_tab.click()
+            time.sleep(1)
+            return
+
+        print("call panic")

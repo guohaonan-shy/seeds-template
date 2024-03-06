@@ -9,6 +9,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 from customer_management.lakeside_search_customers_seeds import LakesideSearchSeeds
 from customer_management.test import init_customer_management_service_driver
+from customer_self_service.lakeside_change_address_seeds import LakesideChangeAddressSeeds
 from customer_self_service.lakeside_complete_user_profile_seeds import LakesideCompleteProfileSeeds
 from customer_self_service.lakeside_insurance_request_seeds import LakesideRequestInsuranceSeeds
 from customer_self_service.lakeside_login_seeds import LakesideLoginSeeds
@@ -94,8 +95,40 @@ class MyTestCase(unittest.TestCase):
 
         new_cnt = len(requests)
 
-        self.assertEqual(new_cnt-old_cnt,  1)
+        self.assertEqual(new_cnt - old_cnt, 1)
         driver.quit()
+
+    def test_change_address(self):
+        driver = init_customer_self_service_driver()
+        # login
+        login_seed = LakesideLoginSeeds(driver)
+        login_seed.execute_seeds(from_signup=False, email="testUser10001@example", password="123456")
+
+        # profile
+        profile_seed = LakesideChangeAddressSeeds(driver)
+        profile_seed.jump_to_profile()
+
+        test_address = "Test Address updated from self-service"
+        test_postal_code = "1000"
+        test_city = "testCity updated from self-service"
+        profile_seed.execute_seeds(test_address, test_postal_code, test_city)
+
+        # assert
+        items = driver.find_elements(By.XPATH, '//div[@role="list"]//div[@role="listitem"]')
+        address = items[1]
+        content = address.find_element(By.CSS_SELECTOR, 'div[class="content"]').text
+
+        middle = content.split(", ")
+        address = middle[0]
+        second = middle[1].split(" ")
+        postal_code, city = second[0], ' '.join(second[1:])
+
+        self.assertEqual(test_address, address)
+        self.assertEqual(test_postal_code, postal_code)
+        self.assertEqual(test_city, city)
+
+        driver.quit()
+
 
 if __name__ == '__main__':
     unittest.main()

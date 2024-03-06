@@ -9,6 +9,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from policy_management.lakeside_agreement import Agreement
 from policy_management.lakeside_policy_edit_seeds import LakesideEditPolicySeeds
 from policy_management.lakeside_policy_fetch_policy_seeds import LakesideFetchPolicySeeds
+from policy_management.lakeside_respond_quote_request_seeds import LakesideRespondQuoteRequestSeeds
 
 policy_types = ["Life Insurance", "Home Insurance", "Health Insurance", "Car Insurance"]
 
@@ -59,10 +60,29 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(res["start_date"], test_start_date)
         self.assertEqual(res["end_date"], test_end_date)
         self.assertEqual(res["policy_type"], test_policy_type)
-        self.assertEqual(res["deduct"], str(test_deduct)+" CHF")
-        self.assertEqual(res["insurance_premium"], str(test_insurance_premium)+" CHF")
-        self.assertEqual(res["policy_limit"], str(test_policy_limit)+" CHF")
+        self.assertEqual(res["deduct"], str(test_deduct) + " CHF")
+        self.assertEqual(res["insurance_premium"], str(test_insurance_premium) + " CHF")
+        self.assertEqual(res["policy_limit"], str(test_policy_limit) + " CHF")
         print("finish comparing......")
+        policy_driver.quit()
+
+    def test_respond(self):
+        policy_driver = init_policy_service_driver()
+        test_username = "Test10001 TestUser"
+        respond_seed = LakesideRespondQuoteRequestSeeds(policy_driver)
+        respond_seed.jump_to_quote_request()
+        target_policy_id = respond_seed.execute_seeds(test_username)
+        respond_seed.jump_to_quote_request()
+        items = policy_driver.find_elements(By.XPATH, '/html/body/div/div[2]/div/table[1]/tbody/tr')
+        for item in items:
+            columns = item.find_elements(By.CSS_SELECTOR, 'td')
+            detail_button = columns[4].find_element(By.CSS_SELECTOR, 'a[class="ui compact small button"]')
+            policy_id = detail_button.get_attribute("href").split('/')[-1]
+            if policy_id == target_policy_id:
+                status = columns[3].find_element(By.CSS_SELECTOR, 'i').text
+                self.assertEqual(status, "Waiting for Customer response")
+                return
+
         policy_driver.quit()
 
 if __name__ == '__main__':

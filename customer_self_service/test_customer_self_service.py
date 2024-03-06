@@ -7,10 +7,12 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
+from customer_management.lakeside_handle_message_seeds import LakesideRespondNotification
 from customer_management.lakeside_search_customers_seeds import LakesideSearchSeeds
 from customer_management.test import init_customer_management_service_driver
 from customer_self_service.lakeside_change_address_seeds import LakesideChangeAddressSeeds
 from customer_self_service.lakeside_complete_user_profile_seeds import LakesideCompleteProfileSeeds
+from customer_self_service.lakeside_customer_send_message_seeds import LakesideCustomerSendMessageSeeds
 from customer_self_service.lakeside_insurance_request_seeds import LakesideRequestInsuranceSeeds
 from customer_self_service.lakeside_login_seeds import LakesideLoginSeeds
 from customer_self_service.lakeside_logout_seeds import LakesideLogoutSeeds
@@ -28,6 +30,7 @@ def init_customer_self_service_driver() -> WebDriver:
     driver.set_window_size(1920, 967)
 
     driver.get("http://localhost:3000")
+    time.sleep(1)
     return driver
 
 
@@ -128,6 +131,47 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(test_city, city)
 
         driver.quit()
+
+    def test_send_messages(self):
+        driver = init_customer_self_service_driver()
+        # login
+        login_seed = LakesideLoginSeeds(driver)
+        login_seed.execute_seeds(from_signup=False, email="testUser10001@example", password="123456")
+        # profile: get username
+        profile_seed = LakesideChangeAddressSeeds(driver)
+        profile_seed.jump_to_profile()
+        items = driver.find_elements(By.XPATH, '//div[@role="list"]//div[@role="listitem"]')
+        username = items[0].find_element(By.CSS_SELECTOR, 'div[class="content"]').text
+        # contact
+        contact_seeds = LakesideCustomerSendMessageSeeds(driver)
+        contact_seeds.jump_to_contact()
+
+        test_message = "test hello!!!"
+        contact_seeds.execute_seed(test_message)
+
+        # behavior from customer management
+
+        management_driver = init_customer_management_service_driver()
+        manager_seed = LakesideRespondNotification(management_driver)
+
+        has_notification = manager_seed.has_notification()
+        self.assertEqual(has_notification, True)
+
+        message_component = manager_seed.find_user_notification(username=username)
+        self.assertIsNotNone(message_component)
+
+        message_component.click()
+        time.sleep(1)
+
+        test_response = "Test Response!!!"
+        manager_seed.response(is_response=True, response=test_response)
+
+
+
+        driver.quit()
+        management_driver.quit()
+
+
 
 
 if __name__ == '__main__':

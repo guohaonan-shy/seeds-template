@@ -40,8 +40,8 @@ class LakesideChangeAddressSeeds:
             return
 
         if self.driver.current_url == "http://localhost:3000/policies" or "http://localhost:3000/contact":
-            policies_tab = self.driver.find_element(By.CSS_SELECTOR, 'a[href="/profile"]')
-            policies_tab.click()
+            profile_tab = self.driver.find_element(By.CSS_SELECTOR, 'a[href="/profile"]')
+            profile_tab.click()
             time.sleep(1)
             return
 

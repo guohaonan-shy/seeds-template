@@ -1,4 +1,5 @@
 import random
+import time
 import unittest
 
 from selenium import webdriver
@@ -24,6 +25,7 @@ def init_customer_management_service_driver() -> webdriver:
     driver.set_window_size(1920, 967)
 
     driver.get("http://localhost:3020")
+    time.sleep(1)
     return driver
 
 

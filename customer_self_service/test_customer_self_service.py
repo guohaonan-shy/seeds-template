@@ -3,16 +3,20 @@ import time
 import unittest
 
 from selenium import webdriver
+from selenium.common import NoSuchElementException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
 
 from customer_management.lakeside_search_customers_seeds import LakesideSearchSeeds
 from customer_management.test import init_customer_management_service_driver
 from customer_self_service.lakeside_complete_user_profile_seeds import LakesideCompleteProfileSeeds
+from customer_self_service.lakeside_insurance_request_seeds import LakesideRequestInsuranceSeeds
 from customer_self_service.lakeside_login_seeds import LakesideLoginSeeds
 from customer_self_service.lakeside_logout_seeds import LakesideLogoutSeeds
 from customer_self_service.lakeside_register_seeds import LakesideRegisterNewUserSeeds
 
 
-def init_customer_self_service_driver() -> webdriver:
+def init_customer_self_service_driver() -> WebDriver:
     options = webdriver.ChromeOptions()
     options.add_argument('__no-sandbox')
     options.add_argument('--headless')
@@ -64,6 +68,34 @@ class MyTestCase(unittest.TestCase):
         customer_customer_driver.quit()
         driver.quit()
 
+    def test_request_insurance(self):
+        driver = init_customer_self_service_driver()
+        # login
+        login_seed = LakesideLoginSeeds(driver)
+        login_seed.execute_seeds(from_signup=False, email="testUser10001@example", password="123456")
+
+        #
+        try:
+            requests = driver.find_elements(By.XPATH, '//table[@class="ui selectable table"]//tbody//tr')
+        except NoSuchElementException:
+            print("there is not requests for this user")
+            requests = []
+
+        old_cnt = len(requests)
+
+        request_insurance_seed = LakesideRequestInsuranceSeeds(driver)
+        request_insurance_seed.execute_seeds()
+
+        try:
+            requests = driver.find_elements(By.XPATH, '//table[@class="ui selectable table"]//tbody//tr')
+        except NoSuchElementException:
+            print("there is not requests for this user")
+            requests = []
+
+        new_cnt = len(requests)
+
+        self.assertEqual(new_cnt-old_cnt,  1)
+        driver.quit()
 
 if __name__ == '__main__':
     unittest.main()

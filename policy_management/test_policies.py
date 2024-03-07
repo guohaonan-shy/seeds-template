@@ -8,6 +8,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 from policy_management.lakeside_agreement import Agreement
 from policy_management.lakeside_policy_customer_management_seeds import LakesidePolicyCustomerManagementSeeds
+from policy_management.lakeside_policy_delete_seeds import LakesideDeletePolicySeeds
 from policy_management.lakeside_policy_edit_seeds import LakesideEditPolicySeeds
 from policy_management.lakeside_policy_fetch_policy_seeds import LakesideFetchPolicySeeds
 from policy_management.lakeside_respond_quote_request_seeds import LakesideRespondQuoteRequestSeeds
@@ -146,6 +147,35 @@ class MyTestCase(unittest.TestCase):
             self.assertEqual(new_policies_cnt - old_policies_cnt, 1)
         else:
             print("score less than 50, don't add new policy for this user......")
+
+    def test_delete_policy(self):
+        policy_driver = init_policy_service_driver()
+        table = policy_driver.find_element(By.CSS_SELECTOR, 'table[class="ui celled padded table"]')
+        items = table.find_elements(By.XPATH, '//tbody//tr')
+
+        test_target_pid = "0x4hwhnfun"
+        for item in items:
+            columns = item.find_elements(By.CSS_SELECTOR, 'td')
+            show_button = columns[-1].find_element(By.CSS_SELECTOR, 'a')
+            pid = show_button.get_attribute("href").split('/')[-1]
+            if pid == test_target_pid:
+                show_button.click()
+                time.sleep(1)
+                print("jump to the detail page......")
+                delete_seeds = LakesideDeletePolicySeeds(policy_driver)
+                delete_seeds.policy_delete(pid)
+                break
+
+        items = policy_driver.find_elements(By.XPATH, '/html/body/div/div[2]/div/table/tbody/tr')
+        is_find = False
+        for item in items:
+            columns = item.find_elements(By.CSS_SELECTOR, 'td')
+            pid = columns[-1].find_element(By.CSS_SELECTOR, 'a').get_attribute("href").split('/')[-1]
+            if pid == test_target_pid:
+                is_find = True
+                break
+        print("assert is delete......")
+        self.assertEqual(is_find, False)
 
 
 if __name__ == '__main__':

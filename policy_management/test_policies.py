@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
 from policy_management.lakeside_agreement import Agreement
+from policy_management.lakeside_policy_customer_management_seeds import LakesidePolicyCustomerManagementSeeds
 from policy_management.lakeside_policy_edit_seeds import LakesideEditPolicySeeds
 from policy_management.lakeside_policy_fetch_policy_seeds import LakesideFetchPolicySeeds
 from policy_management.lakeside_respond_quote_request_seeds import LakesideRespondQuoteRequestSeeds
@@ -83,6 +84,28 @@ class MyTestCase(unittest.TestCase):
                 status = columns[3].find_element(By.CSS_SELECTOR, 'i').text
                 self.assertEqual(status, "Waiting for Customer response")
                 return
+
+        policy_driver.quit()
+
+    def test_search_true(self):
+        policy_driver = init_policy_service_driver()
+        test_condition = "Test10001"
+        test_target = "Test10001 TestUser"
+        customer_seeds = LakesidePolicyCustomerManagementSeeds(policy_driver)
+        customer_seeds.jump_to_customer()
+        uid = customer_seeds.search(test_condition, test_target)
+        self.assertEqual(uid, "2nuil03wfo")
+
+        policy_driver.quit()
+
+    def test_search_false(self):
+        policy_driver = init_policy_service_driver()
+        test_condition = "sdasd"
+        test_target = "Test10001 TestUser"
+        customer_seeds = LakesidePolicyCustomerManagementSeeds(policy_driver)
+        customer_seeds.jump_to_customer()
+        uid = customer_seeds.search(test_condition, test_target)
+        self.assertEqual(uid, None)
 
         policy_driver.quit()
 

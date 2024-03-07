@@ -116,12 +116,13 @@ class MyTestCase(unittest.TestCase):
         customer_seeds = LakesidePolicyCustomerManagementSeeds(policy_driver)
         customer_seeds.jump_to_customer()
 
-
-
         uid = customer_seeds.search(test_condition, test_target)
 
         customer_seeds.click_risk_factor()
         score = customer_seeds.get_risk_factor()
+
+        policies = policy_driver.find_elements(By.XPATH, '/html/body/div/div[2]/div/div[2]/div[4]/div')
+        old_policies_cnt = len(policies)
 
         if score >= 50:
             print("score more than 50, add new policy for this user......")
@@ -139,6 +140,10 @@ class MyTestCase(unittest.TestCase):
                                              policy_limit=test_policy_limit,
                                              agreements=[Agreement("test title",
                                                                    "test content created from policy management")])
+
+            new_policies_cnt = len(policy_driver.find_elements(By.XPATH, '/html/body/div/div[2]/div/div[2]/div[4]/div'))
+            print("assert is new policies added......")
+            self.assertEqual(new_policies_cnt - old_policies_cnt, 1)
         else:
             print("score less than 50, don't add new policy for this user......")
 

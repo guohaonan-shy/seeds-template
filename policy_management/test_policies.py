@@ -109,5 +109,39 @@ class MyTestCase(unittest.TestCase):
 
         policy_driver.quit()
 
+    def test_create_policy_from_policy_management(self):
+        policy_driver = init_policy_service_driver()
+        test_condition = "Test10001"
+        test_target = "Test10001 TestUser"
+        customer_seeds = LakesidePolicyCustomerManagementSeeds(policy_driver)
+        customer_seeds.jump_to_customer()
+
+
+
+        uid = customer_seeds.search(test_condition, test_target)
+
+        customer_seeds.click_risk_factor()
+        score = customer_seeds.get_risk_factor()
+
+        if score >= 50:
+            print("score more than 50, add new policy for this user......")
+
+            test_start_date = '2020-12-31'
+            test_end_date = '2030-12-31'
+            test_policy_type = policy_types[random.randint(0, 3)]
+            test_deduct = 200
+            test_insurance_premium = 3000
+            test_policy_limit = 50000
+
+            customer_seeds.create_new_policy(start_date=test_start_date, end_date=test_end_date,
+                                             policy_type=test_policy_type,
+                                             deduct=test_deduct, insurance_premium=test_insurance_premium,
+                                             policy_limit=test_policy_limit,
+                                             agreements=[Agreement("test title",
+                                                                   "test content created from policy management")])
+        else:
+            print("score less than 50, don't add new policy for this user......")
+
+
 if __name__ == '__main__':
     unittest.main()

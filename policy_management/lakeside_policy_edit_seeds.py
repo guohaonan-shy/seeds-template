@@ -13,9 +13,11 @@ class LakesideEditPolicySeeds:
 
     def execute_seed(self, username, start_date: str, end_date: str, policy_type: str, deduct: int,
                      insurance_premium: int, policy_limit: int,
-                     agreements: list[Agreement] = []):
+                     agreements=None):
         # find the user's policies select one to edit
         # in our seed, we will handle the first one
+        if agreements is None:
+            agreements = []
         table = self.driver.find_element(By.CSS_SELECTOR, 'table[class="ui celled padded table"]')
         items = table.find_elements(By.XPATH, '//tbody//tr')
 
@@ -29,11 +31,12 @@ class LakesideEditPolicySeeds:
 
     def policy_edit(self, start_date: str, end_date: str, policy_type: str, deduct: int, insurance_premium: int,
                     policy_limit: int,
-                    agreements: list[Agreement]):
-        rows = self.driver.find_elements(By.CSS_SELECTOR, 'div[class="row"]')
-        # edit
-        rows[0].find_element(By.CSS_SELECTOR, 'a[class="ui compact button"]').click()
-        time.sleep(1)
+                    agreements: list[Agreement], from_policy_page=False):
+        if not from_policy_page:
+            rows = self.driver.find_elements(By.CSS_SELECTOR, 'div[class="row"]')
+            # edit
+            rows[0].find_element(By.CSS_SELECTOR, 'a[class="ui compact button"]').click()
+            time.sleep(1)
         print("start editing......")
         rows = self.driver.find_elements(By.XPATH,
                                          '//form[@class="ui form"]//div[@class="ui two column internally celled grid"]/div[@class="row"]')

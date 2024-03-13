@@ -14,7 +14,7 @@ class LakesideCustomerSendMessageSeeds:
         message_input = chatroom.find_element(By.CSS_SELECTOR, 'input[placeholder="Enter a Message"]')
         message_input.clear()
         message_input.send_keys(message)
-        print("response content:{}".format(message_input.get_attribute("value")))
+        print("send message content:{}".format(message_input.get_attribute("value")))
 
         # send
         send_button = chatroom.find_element(By.CSS_SELECTOR, 'button[class="ui green button"]')

@@ -3,32 +3,21 @@ import time
 import unittest
 
 from selenium import webdriver
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
+from customer_self_service.lakeside_insurance_request_seeds import LakesideRequestInsuranceSeeds
+from customer_self_service.lakeside_login_seeds import LakesideLoginSeeds
 from policy_management.lakeside_agreement import Agreement
 from policy_management.lakeside_policy_customer_management_seeds import LakesidePolicyCustomerManagementSeeds
 from policy_management.lakeside_policy_delete_seeds import LakesideDeletePolicySeeds
 from policy_management.lakeside_policy_edit_seeds import LakesideEditPolicySeeds
 from policy_management.lakeside_policy_fetch_policy_seeds import LakesideFetchPolicySeeds
 from policy_management.lakeside_respond_quote_request_seeds import LakesideRespondQuoteRequestSeeds
+from utils import init_customer_self_service_driver, init_customer_management_service_driver, init_policy_service_driver
 
 policy_types = ["Life Insurance", "Home Insurance", "Health Insurance", "Car Insurance"]
-
-
-def init_policy_service_driver() -> WebDriver:
-    options = webdriver.ChromeOptions()
-    options.add_argument('__no-sandbox')
-    options.add_argument('--headless')
-    options.add_argument('--hide-scrollbars')
-
-    driver = webdriver.Chrome(options=options)
-
-    driver.set_window_size(1920, 967)
-
-    driver.get("http://localhost:3010")
-    time.sleep(1)
-    return driver
 
 
 class MyTestCase(unittest.TestCase):
@@ -176,6 +165,43 @@ class MyTestCase(unittest.TestCase):
                 break
         print("assert is delete......")
         self.assertEqual(is_find, False)
+
+    def test_insurance_quote(self):
+        customer_driver = init_customer_self_service_driver()
+        # login
+        login_seed = LakesideLoginSeeds(customer_driver)
+        login_seed.execute_seeds(from_signup=False, email="testUserCase6879@example.com", password="744822")
+
+        #
+        try:
+            requests = customer_driver.find_elements(By.XPATH, '//table[@class="ui selectable table"]//tbody//tr')
+        except NoSuchElementException:
+            print("there is not requests for this user")
+            requests = []
+
+        # request a new quote
+        request_insurance_seed = LakesideRequestInsuranceSeeds(customer_driver)
+        request_insurance_seed.execute_seeds()
+        # process from policy management
+        policy_driver = init_policy_service_driver()
+        test_username = "User6754 Test"
+        respond_seed = LakesideRespondQuoteRequestSeeds(policy_driver)
+        respond_seed.jump_to_quote_request()
+        target_policy_id = respond_seed.execute_seeds(test_username)
+        respond_seed.jump_to_quote_request()
+        items = policy_driver.find_elements(By.XPATH, '/html/body/div/div[2]/div/table[1]/tbody/tr')
+        for item in items:
+            columns = item.find_elements(By.CSS_SELECTOR, 'td')
+            detail_button = columns[4].find_element(By.CSS_SELECTOR, 'a[class="ui compact small button"]')
+            policy_id = detail_button.get_attribute("href").split('/')[-1]
+            if policy_id == target_policy_id:
+                print("policy_id:{},assert".format(policy_id))
+                status = columns[3].find_element(By.CSS_SELECTOR, 'i').text
+                self.assertEqual(status, "Waiting for Customer response")
+                return
+
+        policy_driver.quit()
+        customer_driver.quit()
 
 
 if __name__ == '__main__':

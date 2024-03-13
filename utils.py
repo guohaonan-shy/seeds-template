@@ -1,3 +1,9 @@
+import time
+
+from selenium import webdriver
+from selenium.webdriver.remote.webdriver import WebDriver
+
+
 def convertMonth(month: str):
     if month == "January":
         return "01"
@@ -60,3 +66,46 @@ def convertDay(day: str):
     if value < 10:
         return "0" + str(value)
     return str(value)
+
+def init_customer_management_service_driver() -> WebDriver:
+    options = webdriver.ChromeOptions()
+    options.add_argument('__no-sandbox')
+    options.add_argument('--headless')
+    options.add_argument('--hide-scrollbars')
+
+    driver = webdriver.Chrome(options=options)
+
+    driver.set_window_size(1920, 967)
+
+    driver.get("http://localhost:3020")
+    time.sleep(1)
+    return driver
+
+def init_customer_self_service_driver() -> WebDriver:
+    options = webdriver.ChromeOptions()
+    options.add_argument('__no-sandbox')
+    options.add_argument('--headless')
+    options.add_argument('--hide-scrollbars')
+
+    driver = webdriver.Chrome(options=options)
+
+    driver.set_window_size(1920, 967)
+
+    driver.get("http://localhost:3000")
+    time.sleep(1)
+    return driver
+
+
+def init_policy_service_driver() -> WebDriver:
+    options = webdriver.ChromeOptions()
+    options.add_argument('__no-sandbox')
+    options.add_argument('--headless')
+    options.add_argument('--hide-scrollbars')
+
+    driver = webdriver.Chrome(options=options)
+
+    driver.set_window_size(1920, 967)
+
+    driver.get("http://localhost:3010")
+    time.sleep(1)
+    return driver

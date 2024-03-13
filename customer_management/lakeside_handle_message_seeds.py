@@ -32,7 +32,10 @@ class LakesideRespondNotification:
             is_response = bool(random.randint(0, 1))
             response_message = ""
             if is_response:
+                print("want to response......")
                 response_message = "test hello!"
+            else:
+                print("response later......")
             message.click()
             time.sleep(3)
             self.response(is_response, response_message)

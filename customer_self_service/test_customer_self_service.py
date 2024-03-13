@@ -9,7 +9,6 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 from customer_management.lakeside_handle_message_seeds import LakesideRespondNotification
 from customer_management.lakeside_search_customers_seeds import LakesideSearchSeeds
-from customer_management.test import init_customer_management_service_driver
 from customer_self_service.lakeside_change_address_seeds import LakesideChangeAddressSeeds
 from customer_self_service.lakeside_complete_user_profile_seeds import LakesideCompleteProfileSeeds
 from customer_self_service.lakeside_customer_respond_seeds import LakesideCustomerRespondSeeds
@@ -18,21 +17,7 @@ from customer_self_service.lakeside_insurance_request_seeds import LakesideReque
 from customer_self_service.lakeside_login_seeds import LakesideLoginSeeds
 from customer_self_service.lakeside_logout_seeds import LakesideLogoutSeeds
 from customer_self_service.lakeside_register_seeds import LakesideRegisterNewUserSeeds
-
-
-def init_customer_self_service_driver() -> WebDriver:
-    options = webdriver.ChromeOptions()
-    options.add_argument('__no-sandbox')
-    options.add_argument('--headless')
-    options.add_argument('--hide-scrollbars')
-
-    driver = webdriver.Chrome(options=options)
-
-    driver.set_window_size(1920, 967)
-
-    driver.get("http://localhost:3000")
-    time.sleep(1)
-    return driver
+from utils import init_customer_self_service_driver, init_customer_management_service_driver
 
 
 class MyTestCase(unittest.TestCase):
@@ -64,6 +49,8 @@ class MyTestCase(unittest.TestCase):
         findRes = seed.execute_seeds("User", "{} Test".format(first_name))
 
         self.assertEqual(findRes, True)
+        if findRes:
+            print("Registration success......")
 
         # logout
         logout_seed = LakesideLogoutSeeds(driver)
@@ -77,7 +64,7 @@ class MyTestCase(unittest.TestCase):
         driver = init_customer_self_service_driver()
         # login
         login_seed = LakesideLoginSeeds(driver)
-        login_seed.execute_seeds(from_signup=False, email="testUser10001@example", password="123456")
+        login_seed.execute_seeds(from_signup=False, email="testUserCase6879@example", password="744822")
 
         #
         try:
@@ -87,7 +74,7 @@ class MyTestCase(unittest.TestCase):
             requests = []
 
         old_cnt = len(requests)
-
+        # request a new quote
         request_insurance_seed = LakesideRequestInsuranceSeeds(driver)
         request_insurance_seed.execute_seeds()
 

@@ -1,8 +1,6 @@
 import random
-import time
 import unittest
 
-from selenium import webdriver
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
@@ -12,21 +10,9 @@ from customer_management.lakeside_edit_customer_profile_seeds import LakesideEdi
 from customer_management.lakeside_fetch_customer_seeds import LakeSideFetchProfileSeeds
 from customer_management.lakeside_handle_message_seeds import LakesideRespondNotification
 from customer_management.lakeside_search_customers_seeds import LakesideSearchSeeds
-
-
-def init_customer_management_service_driver() -> webdriver:
-    options = webdriver.ChromeOptions()
-    options.add_argument('__no-sandbox')
-    options.add_argument('--headless')
-    options.add_argument('--hide-scrollbars')
-
-    driver = webdriver.Chrome(options=options)
-
-    driver.set_window_size(1920, 967)
-
-    driver.get("http://localhost:3020")
-    time.sleep(1)
-    return driver
+from customer_self_service.lakeside_customer_send_message_seeds import LakesideCustomerSendMessageSeeds
+from customer_self_service.lakeside_login_seeds import LakesideLoginSeeds
+from utils import init_customer_self_service_driver, init_customer_management_service_driver
 
 
 class UpdateDto:
@@ -280,9 +266,19 @@ class MyTestCase(unittest.TestCase):
 
     def test_response(self):
         driver = init_customer_management_service_driver()
+        customer_driver = init_customer_self_service_driver()
+        # login
+        login_seed = LakesideLoginSeeds(customer_driver)
+        login_seed.execute_seeds(from_signup=False, email="testUserCase6879@example.com", password="744822")
 
-        # todo: 先这样，后续完成注册seeds，可以构建自动化case
-        # 这里先手动用test账号构建一些消息
+        # jump to contact
+        customer_seed = LakesideCustomerSendMessageSeeds(customer_driver)
+        customer_seed.jump_to_contact()
+
+        send_msg = "hello, this is test user 6879, send message~~~"
+        customer_seed.execute_seed(message=send_msg)
+
+        # management response
         response_seeds = LakesideRespondNotification(driver)
         response_seeds.execute_seeds()
 

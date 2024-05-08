@@ -1,5 +1,4 @@
 import os
-import random
 import time
 
 from selenium.webdriver.common.by import By
@@ -19,7 +18,7 @@ class NicefishWritePostSeeds:
         print("start editing the post......")
         # upload image or video
         file_upload = self.driver.find_element(By.CSS_SELECTOR, 'input[accept="image/*,video/mp4"]')
-        abs_path = os.path.abspath("./static_material/test_image.jpeg")
+        abs_path = os.path.abspath(material_path)
         file_upload.send_keys(abs_path)
         time.sleep(1)  # waiting for uploading
         # form

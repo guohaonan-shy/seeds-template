@@ -3,6 +3,7 @@ import time
 import unittest
 
 from nicefish_seeds.comment_seeds import NicefishCommentSeeds
+from nicefish_seeds.follow_seeds import NicefishFollowSeeds
 from nicefish_seeds.login_seeds import NicefishLoginSeeds
 from nicefish_seeds.signup_seeds import NicefishSignUpSeeds
 from nicefish_seeds.utils import init_nicefish_driver
@@ -86,3 +87,22 @@ class MyTestCase(unittest.TestCase):
         comment_post_seeds.execute_seeds(comment='fantastic !!!!')
 
         driver.quit()
+
+    def test_follow_writer(self):
+        driver = init_nicefish_driver()
+
+        # because we haven't logged in yet, we will redirect to the sign-in page
+        login_seed = NicefishLoginSeeds(driver)
+        login_seed.jump_from_home()
+        login_seed.execute_seeds("TestUser001@123.com", "12345678")
+
+        follow_seed = NicefishFollowSeeds(driver)
+        follow_cnt = follow_seed.get_current_follows()
+
+        follow_seed.jump_to_detail()
+
+        follow_seed.execute_seeds()
+
+        new_cnt = follow_seed.get_current_follows()
+
+        self.assertEqual(follow_cnt + 1, new_cnt)

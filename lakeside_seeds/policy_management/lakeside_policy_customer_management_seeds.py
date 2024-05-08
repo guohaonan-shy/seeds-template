@@ -5,8 +5,8 @@ from typing import Optional
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from policy_management.lakeside_agreement import Agreement
-from policy_management.lakeside_policy_edit_seeds import LakesideEditPolicySeeds
+from lakeside_seeds.policy_management.lakeside_agreement import Agreement
+from lakeside_seeds.policy_management.lakeside_policy_edit_seeds import LakesideEditPolicySeeds
 
 
 class LakesidePolicyCustomerManagementSeeds:

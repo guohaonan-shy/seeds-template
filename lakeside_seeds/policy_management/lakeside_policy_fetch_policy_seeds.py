@@ -1,9 +1,7 @@
-import time
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from utils import convertMonthV2
+from lakeside_seeds.utils import convertMonthV2
 
 
 class LakesideFetchPolicySeeds:

@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver import Keys
 
-from policy_management.lakeside_agreement import Agreement
+from lakeside_seeds.policy_management.lakeside_agreement import Agreement
 
 
 class LakesideEditPolicySeeds:

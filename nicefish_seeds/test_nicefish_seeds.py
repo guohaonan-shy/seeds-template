@@ -4,6 +4,7 @@ import unittest
 
 from nicefish_seeds.comment_seeds import NicefishCommentSeeds
 from nicefish_seeds.follow_seeds import NicefishFollowSeeds
+from nicefish_seeds.like_seeds import NicefishLikeSeeds
 from nicefish_seeds.login_seeds import NicefishLoginSeeds
 from nicefish_seeds.signup_seeds import NicefishSignUpSeeds
 from nicefish_seeds.utils import init_nicefish_driver
@@ -106,3 +107,15 @@ class MyTestCase(unittest.TestCase):
         new_cnt = follow_seed.get_current_follows()
 
         self.assertEqual(follow_cnt + 1, new_cnt)
+
+    def test_like_poster(self):
+        driver = init_nicefish_driver()
+        login_seed = NicefishLoginSeeds(driver)
+        login_seed.jump_from_home()
+        login_seed.execute_seeds("TestUser001@123.com", "12345678")
+
+        like_seed = NicefishLikeSeeds(driver)
+
+        like_seed.jump_to_detail()
+
+        like_seed.execute_seeds()

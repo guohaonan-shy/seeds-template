@@ -3,6 +3,8 @@ import time
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.support import wait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 class NicefishWritePostSeeds:
@@ -30,9 +32,9 @@ class NicefishWritePostSeeds:
         # input the captcha
         captcha_input = form.find_element(By.CSS_SELECTOR, 'input[name="captcha"]')
         captcha_input.send_keys("0")
-        time.sleep(2)
+
         # submit
-        submit_button = form.find_element(By.CSS_SELECTOR, 'button[class="btn btn-primary"]')
+        submit_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[class="btn btn-primary"]')))
         submit_button.click()
         print("edit post success......")
         time.sleep(2)

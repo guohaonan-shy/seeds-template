@@ -8,6 +8,7 @@ from nicefish_seeds.comment_seeds import NicefishCommentSeeds
 from nicefish_seeds.follow_seeds import NicefishFollowSeeds
 from nicefish_seeds.like_seeds import NicefishLikeSeeds
 from nicefish_seeds.login_seeds import NicefishLoginSeeds
+from nicefish_seeds.post_delete_seeds import NicefishPostDeleteSeeds
 from nicefish_seeds.profile_seeds import NicefishProfileSeeds
 from nicefish_seeds.signup_seeds import NicefishSignUpSeeds
 from nicefish_seeds.utils import init_nicefish_driver
@@ -183,3 +184,19 @@ class MyTestCase(unittest.TestCase):
         profile_seed.execute_seeds(avatar=avatar, nickname=nickname, remark=remark)
 
         driver.quit()
+
+    def test_delete_post(self):
+        driver = init_nicefish_driver()
+        login_seed = NicefishLoginSeeds(driver)
+        login_seed.jump_from_home()
+        login_seed.execute_seeds("TestUser001@123.com", "12345678")
+
+        write_post_seeds = NicefishWritePostSeeds(driver)
+        write_post_seeds.jump_to_write_post()
+        # edit
+        write_post_seeds.execute_seeds(material_path="./static_material/test_image.jpeg",
+                                       description="delete post")
+
+        delete_post_seed = NicefishPostDeleteSeeds(driver)
+        delete_post_seed.jump_to_post_management_page()
+        delete_post_seed.execute_seeds()

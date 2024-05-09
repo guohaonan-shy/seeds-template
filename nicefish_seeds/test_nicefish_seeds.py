@@ -8,6 +8,7 @@ from nicefish_seeds.comment_seeds import NicefishCommentSeeds
 from nicefish_seeds.follow_seeds import NicefishFollowSeeds
 from nicefish_seeds.like_seeds import NicefishLikeSeeds
 from nicefish_seeds.login_seeds import NicefishLoginSeeds
+from nicefish_seeds.profile_seeds import NicefishProfileSeeds
 from nicefish_seeds.signup_seeds import NicefishSignUpSeeds
 from nicefish_seeds.utils import init_nicefish_driver
 from nicefish_seeds.write_post_seeds import NicefishWritePostSeeds
@@ -162,3 +163,18 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(before_collect_status, False)
         # execute
         collect_seed.execute_seeds()
+
+    def test_update_profile(self):
+        driver = init_nicefish_driver()
+        login_seed = NicefishLoginSeeds(driver)
+        login_seed.jump_from_home()
+        login_seed.execute_seeds("TestUser001@123.com", "12345678")
+
+        profile_seed = NicefishProfileSeeds(driver)
+        profile_seed.jump_to_profile()
+
+        avatar = "./static_material/test_avatar.png"
+        nickname = "lucky dog"
+        remark = "here is a dog......"
+
+        profile_seed.execute_seeds(avatar=avatar, nickname=nickname, remark=remark)

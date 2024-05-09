@@ -2,6 +2,7 @@ import random
 import time
 import unittest
 
+from nicefish_seeds.access_writer_info_seeds import NicefishAccessWriterSeeds
 from nicefish_seeds.comment_seeds import NicefishCommentSeeds
 from nicefish_seeds.follow_seeds import NicefishFollowSeeds
 from nicefish_seeds.like_seeds import NicefishLikeSeeds
@@ -114,8 +115,24 @@ class MyTestCase(unittest.TestCase):
         login_seed.jump_from_home()
         login_seed.execute_seeds("TestUser001@123.com", "12345678")
 
+        # get the like count before click
+        driver1 = init_nicefish_driver()
+        login_seed1 = NicefishLoginSeeds(driver1)
+        login_seed1.jump_from_home()
+        login_seed1.execute_seeds("TestUser001@123.com", "12345678")
+
+        user_home_seed = NicefishAccessWriterSeeds(driver1)
+        user_home_seed.jump_from_homepage()
+        before_cnt = user_home_seed.get_likes()
+        # execute like operation
         like_seed = NicefishLikeSeeds(driver)
 
         like_seed.jump_to_detail()
 
         like_seed.execute_seeds()
+        # check
+        driver1.refresh()
+        time.sleep(1)
+        after_cnt = user_home_seed.get_likes()
+
+        self.assertEqual(before_cnt+1, after_cnt)

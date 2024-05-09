@@ -49,8 +49,11 @@ class NicefishProfileSeeds:
         repeat_password_input.clear()
         repeat_password_input.send_keys(password)
 
+
+        submit_button = self.driver.find_element(By.CSS_SELECTOR, 'button[class="btn btn-primary me-3"]')
         time.sleep(2)
-        self.driver.find_element(By.CSS_SELECTOR, 'button[class="btn btn-primary me-3"]').click()
+        submit_button.click()
+        time.sleep(2)
         print("submit......")
 
 

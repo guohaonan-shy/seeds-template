@@ -164,6 +164,9 @@ class MyTestCase(unittest.TestCase):
         # execute
         collect_seed.execute_seeds()
 
+        driver.quit()
+        driver1.quit()
+
     def test_update_profile(self):
         driver = init_nicefish_driver()
         login_seed = NicefishLoginSeeds(driver)
@@ -178,3 +181,5 @@ class MyTestCase(unittest.TestCase):
         remark = "here is a dog......"
 
         profile_seed.execute_seeds(avatar=avatar, nickname=nickname, remark=remark)
+
+        driver.quit()

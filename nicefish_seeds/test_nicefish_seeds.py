@@ -3,6 +3,7 @@ import time
 import unittest
 
 from nicefish_seeds.access_writer_info_seeds import NicefishAccessWriterSeeds
+from nicefish_seeds.collect_seeds import NicefishCollectSeeds
 from nicefish_seeds.comment_seeds import NicefishCommentSeeds
 from nicefish_seeds.follow_seeds import NicefishFollowSeeds
 from nicefish_seeds.like_seeds import NicefishLikeSeeds
@@ -71,7 +72,8 @@ class MyTestCase(unittest.TestCase):
         # after logging in, we will direct back to the home page
         write_post_seeds.jump_to_write_post()
         # edit
-        write_post_seeds.execute_seeds(material_path="./static_material/test_image.jpeg", description="write a post about a cartoon character")
+        write_post_seeds.execute_seeds(material_path="./static_material/test_image.jpeg",
+                                       description="write a post about a cartoon character")
 
         driver.quit()
 
@@ -135,4 +137,28 @@ class MyTestCase(unittest.TestCase):
         time.sleep(1)
         after_cnt = user_home_seed.get_likes()
 
-        self.assertEqual(before_cnt+1, after_cnt)
+        self.assertEqual(before_cnt + 1, after_cnt)
+
+    def test_collect_poster(self):
+        driver = init_nicefish_driver()
+        login_seed = NicefishLoginSeeds(driver)
+        login_seed.jump_from_home()
+        login_seed.execute_seeds("TestUser001@123.com", "12345678")
+
+        # execute like operation
+        collect_seed = NicefishCollectSeeds(driver)
+
+        collect_seed.jump_to_detail(target_post_id=57)
+
+        # get the collection before click
+        driver1 = init_nicefish_driver()
+        login_seed1 = NicefishLoginSeeds(driver1)
+        login_seed1.jump_from_home()
+        login_seed1.execute_seeds("TestUser001@123.com", "12345678")
+
+        user_home_seed = NicefishAccessWriterSeeds(driver1)
+        user_home_seed.jump_from_homepage()
+        before_collect_status = user_home_seed.get_targeted_collection(target_post_id=57)
+        self.assertEqual(before_collect_status, False)
+        # execute
+        collect_seed.execute_seeds()

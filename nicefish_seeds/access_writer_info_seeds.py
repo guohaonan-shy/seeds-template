@@ -1,5 +1,6 @@
 import time
 
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
@@ -34,3 +35,19 @@ class NicefishAccessWriterSeeds:
                                                       '/html/body/div/div[4]/div/div[1]/div[2]/div[1]/p[3]/span[2]')
         cnt = int(like_cnt_component.text)
         return cnt
+
+    def get_targeted_collection(self, target_post_id: int) -> bool:
+        print("start to click 'saved' tab......")
+        time.sleep(2)
+        saved_tab = self.driver.find_element(By.XPATH, '/html/body/div/div[4]/div/div[2]/div/div[1]/div/ul/li[2]/a')
+        saved_tab.click()
+        time.sleep(2)
+
+        res = False
+        try:
+            self.driver.find_element(By.CSS_SELECTOR, 'a[href="/post/post-detail/{}"]'.format(target_post_id))
+            res = True
+        except NoSuchElementException:
+            print("there is no post in collection")
+
+        return res

@@ -41,7 +41,8 @@ class NicefishLoginSeeds:
         captcha_input.send_keys("0")
         #
         submit_button = signin_form.find_element(By.CSS_SELECTOR, 'button[class="btn btn-primary me-3"]')
+        time.sleep(2)
         submit_button.click()
-        time.sleep(1)
+        time.sleep(2)
         print("sign in success......")
 

@@ -14,7 +14,7 @@ def init_nicefish_driver() -> WebDriver:
 
     driver = webdriver.Chrome(options=options)
 
-    driver.set_window_size(1920, 967)
+    driver.set_window_size(1920, 1080)
 
     driver.get("http://172.26.190.201:8091/post")
     # main page starts from http://172.26.190.201:8091 to http://172.26.190.201:8091/post

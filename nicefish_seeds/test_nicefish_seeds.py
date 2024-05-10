@@ -186,6 +186,7 @@ class MyTestCase(unittest.TestCase):
         driver.quit()
 
     def test_delete_post(self):
+        # 有个点没有搞懂，必须将网页滚动至按钮出，才可顺利执行，否则会爆unclickable的error，后续需要解决
         driver = init_nicefish_driver()
         login_seed = NicefishLoginSeeds(driver)
         login_seed.jump_from_home()
@@ -200,3 +201,18 @@ class MyTestCase(unittest.TestCase):
         delete_post_seed = NicefishPostDeleteSeeds(driver)
         delete_post_seed.jump_to_post_management_page()
         delete_post_seed.execute_seeds()
+
+    # def test_delete_comment(self):
+    #     driver = init_nicefish_driver()
+    #     login_seed = NicefishLoginSeeds(driver)
+    #     login_seed.jump_from_home()
+    #     login_seed.execute_seeds("TestUser001@123.com", "12345678")
+    #
+    #     write_comment_seeds = NicefishCommentSeeds(driver)
+    #     write_comment_seeds.jump_to_detail()
+    #     # edit
+    #     write_comment_seeds.execute_seeds(comment='delete !!!!')
+    #
+    #     delete_post_seed = NicefishPostDeleteSeeds(driver)
+    #     delete_post_seed.jump_to_post_management_page()
+    #     delete_post_seed.execute_seeds()

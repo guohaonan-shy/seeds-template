@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import wait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 class NicefishWritePostSeeds:
@@ -22,7 +23,7 @@ class NicefishWritePostSeeds:
         file_upload = self.driver.find_element(By.CSS_SELECTOR, 'input[accept="image/*,video/mp4"]')
         abs_path = os.path.abspath(material_path)
         file_upload.send_keys(abs_path)
-        time.sleep(1)  # waiting for uploading
+        time.sleep(2)  # waiting for uploading
         # form
         form = self.driver.find_element(By.CSS_SELECTOR, 'form[role="form"]')
         # input the description
@@ -32,8 +33,9 @@ class NicefishWritePostSeeds:
         # input the captcha
         captcha_input = form.find_element(By.CSS_SELECTOR, 'input[name="captcha"]')
         captcha_input.send_keys("0")
-
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         # submit
+        wait = WebDriverWait(self.driver, 10)
         submit_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[class="btn btn-primary"]')))
         submit_button.click()
         print("edit post success......")

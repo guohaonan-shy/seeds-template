@@ -4,6 +4,7 @@ import unittest
 
 from nicefish_seeds.access_writer_info_seeds import NicefishAccessWriterSeeds
 from nicefish_seeds.collect_seeds import NicefishCollectSeeds
+from nicefish_seeds.comment_delete_seeds import NicefishCommentDeleteSeeds
 from nicefish_seeds.comment_seeds import NicefishCommentSeeds
 from nicefish_seeds.follow_seeds import NicefishFollowSeeds
 from nicefish_seeds.like_seeds import NicefishLikeSeeds
@@ -202,17 +203,17 @@ class MyTestCase(unittest.TestCase):
         delete_post_seed.jump_to_post_management_page()
         delete_post_seed.execute_seeds()
 
-    # def test_delete_comment(self):
-    #     driver = init_nicefish_driver()
-    #     login_seed = NicefishLoginSeeds(driver)
-    #     login_seed.jump_from_home()
-    #     login_seed.execute_seeds("TestUser001@123.com", "12345678")
-    #
-    #     write_comment_seeds = NicefishCommentSeeds(driver)
-    #     write_comment_seeds.jump_to_detail()
-    #     # edit
-    #     write_comment_seeds.execute_seeds(comment='delete !!!!')
-    #
-    #     delete_post_seed = NicefishPostDeleteSeeds(driver)
-    #     delete_post_seed.jump_to_post_management_page()
-    #     delete_post_seed.execute_seeds()
+    def test_delete_comment(self):
+        driver = init_nicefish_driver()
+        login_seed = NicefishLoginSeeds(driver)
+        login_seed.jump_from_home()
+        login_seed.execute_seeds("TestUser001@123.com", "12345678")
+
+        write_comment_seeds = NicefishCommentSeeds(driver)
+        write_comment_seeds.jump_to_detail(target_post_id=68)
+        # edit
+        write_comment_seeds.execute_seeds(comment='delete !!!!')
+
+        delete_comment_seed = NicefishCommentDeleteSeeds(driver)
+        delete_comment_seed.jump_to_comment_management_page()
+        delete_comment_seed.execute_seeds()
